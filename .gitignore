@@ -1,0 +1,5 @@
+node_modules/
+dist/
+logs/
+v1/src/.env
+v1/src/config/.env
