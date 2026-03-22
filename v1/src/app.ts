@@ -1,0 +1,32 @@
+import loaders from './loaders';
+import express, {Request, Response, NextFunction} from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import {UserRoutes} from './api-routes'
+
+loaders();
+
+const app = express();
+
+app.use(helmet());
+app.use(cors({
+    origin: "*",
+    methods: ['GET', 'POST', 'DELETE', 'PATCH', 'PUT'],
+}))
+app.use(express.json());
+
+const apiRouter = express.Router();
+apiRouter.use('/users', UserRoutes)
+app.use('/api', apiRouter);
+
+app.listen(3001, () => {
+    console.log('Server is running on port 3001')
+})
+
+apiRouter.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    const error = new Error('There is no such a path') as any;
+    error.status = 404
+    next(error)
+})
+
+
