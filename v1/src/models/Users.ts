@@ -18,10 +18,10 @@ const BillingInformationSchema = new Schema({
 
 const UserSchema = new Schema({
     email: {type: String, required:true, unique: true, maxLength: 128, index: true},
-    password: {type: String, maxLength: 24, required: true},
-    company_name: {type: String, maxLength: 128},
-    contact_person: {type: String, maxLength: 128},
-    phone_number: {type: String, maxLength: 12},
+    password: {type: String, maxLength: 64, required: true},
+    company_name: {type: String, maxLength: 128, required: true},
+    contact_person: {type: String, maxLength: 128, required: true},
+    phone_number: {type: String, maxLength: 12, required: true},
     country_region: {type: String, maxLength: 128},
     address: {type: String, maxLength: 256},
     postal_code: {type: String, maxLength: 12},

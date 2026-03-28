@@ -1,25 +1,31 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import loaders from './loaders';
 import express, {Request, Response, NextFunction} from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import {UserRoutes} from './api-routes'
+import connect from './loaders/db';
 
-loaders();
+// loaders();
 
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 app.use(helmet());
 app.use(cors({
     origin: "*",
     methods: ['GET', 'POST', 'DELETE', 'PATCH', 'PUT'],
 }))
-app.use(express.json());
+
 
 const apiRouter = express.Router();
 apiRouter.use('/users', UserRoutes)
 app.use('/api', apiRouter);
 
 app.listen(3001, () => {
+    // connect();
     console.log('Server is running on port 3001')
 })
 
