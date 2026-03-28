@@ -16,7 +16,7 @@ class BaseService{
     }
 
     findOne(where: object){
-        return this.baseModel.find(where)
+        return this.baseModel.findOne(where)
     }
 
     update(user_id: string, id: string, data: object){

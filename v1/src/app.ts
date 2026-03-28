@@ -5,9 +5,8 @@ import express, {Request, Response, NextFunction} from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import {UserRoutes} from './api-routes'
-import connect from './loaders/db';
 
-// loaders();
+loaders();
 
 const app = express();
 
@@ -25,7 +24,6 @@ apiRouter.use('/users', UserRoutes)
 app.use('/api', apiRouter);
 
 app.listen(3001, () => {
-    // connect();
     console.log('Server is running on port 3001')
 })
 

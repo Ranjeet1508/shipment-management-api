@@ -19,10 +19,9 @@ const connectDB = async () => {
 
 const connectDBTest = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/shipment-management-test");
-        // await mongoose.connect(process.env.MONGO_URI_TEST || "mongodb://localhost:27017/shipment-management-test", {
-        //     authSource: "admin",
-        // });
+        await mongoose.connect(process.env.MONGO_URI_TEST || "mongodb://localhost:27017/shipment-management-test", {
+            authSource: "admin",
+        });
     } catch (error) {
         console.error("Error connecting to database", error);
         process.exit(1);
