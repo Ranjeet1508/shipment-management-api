@@ -9,15 +9,15 @@ const passwordToHash = (password: string): string => {
   ).toString();
 };
 
-const generateAccessToken = (user: IUser): string => {
+const generateAccessToken = (user: IUser, time: any = `1W`): string => {
   return JWT.sign(user, process.env.ACCESS_TOKEN_SECRET_KEY as string, {
-    expiresIn: "1W",
+    expiresIn: time,
   });
 };
 
-const generateRefreshToken = (user: IUser): string => {
+const generateRefreshToken = (user: IUser, time: any = "1y"): string => {
   return JWT.sign(user, process.env.REFRESH_TOKEN_SECRET_KEY as string, {
-    expiresIn: "1y",
+    expiresIn: time,
   });
 };
 

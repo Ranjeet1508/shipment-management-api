@@ -31,4 +31,8 @@ const updateBillingInformation = Joi.object({
     postcode: Joi.string().max(48).required()
 })
 
-export default { create, login, changePassword, updateBillingInformation }
+const forgotPassword = Joi.object({
+    email: Joi.string().email().max(128).required()
+})
+
+export default { create, login, changePassword, updateBillingInformation, forgotPassword }

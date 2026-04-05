@@ -1,9 +1,12 @@
 import BaseContoller from "./baseController";
 import UserService from "../services/UserService";
 import { IUser } from "../interfaces/models";
-import { generateAccessToken, passwordToHash } from "../scripts/utils/helper";
+import { generateAccessToken, generateRefreshToken, passwordToHash } from "../scripts/utils/helper";
 import { Request, Response } from "express";
 import httpStatus from "http-status";
+import eventEmitter from "../scripts/events/eventEmitter";
+
+const isDev = process.env.NODE_ENV === "development";
 
 class User extends BaseContoller {
   constructor() {
@@ -50,7 +53,7 @@ class User extends BaseContoller {
             email: user.email,
             id: user._id,
           } as any),
-          refreshToken: generateAccessToken({
+          refreshToken: generateRefreshToken({
             email: user.email,
             id: user._id,
           } as any),
@@ -60,7 +63,25 @@ class User extends BaseContoller {
     });
   };
 
-  forgotPassword = (req: Request, res: Response) => {};
+  forgotPassword = (req: Request, res: Response) => {
+    this.service.findOne({email: req.body.email}).then((user: IUser) => {
+      if(!user){
+        return res.status(httpStatus.NOT_FOUND).send({message: "User not found"});
+      }
+      const accessToken = generateAccessToken({email: user.email, id: user._id} as any, '15m');
+      const timestamp = Date.now();
+      const baseUrl = isDev ? "http://localhost:3001" : process.env.BASE_URL;
+      const resetLink = `${baseUrl}/reset-password?token=${accessToken}&timestamp=${timestamp}`;
+      eventEmitter.emit("send_mail", {
+        to: user.email,
+        subject: "Password Reset Request",
+        html: `<p>You requested a password reset. Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a><p>This link will expire in 15 minutes.</p>`,
+      })
+      return res.status(httpStatus.OK).send({message: "Password reset link send successfully", content: resetLink});
+    }).catch((error: any) => {
+      return this.APIResponseMessages.errorOccured(res, error);
+    })
+  };
 
   changePassword = (req: Request, res: Response) => {
     req.body.password = passwordToHash(req.body.password);
