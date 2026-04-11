@@ -3,6 +3,7 @@ import BaseController from "./baseController";
 import { Request, Response } from "express";
 import { ICarrier } from "../interfaces/models";
 import { Types } from "mongoose";
+import XLSX from "xlsx";
 
 class Carrier extends BaseController {
   constructor() {
@@ -244,7 +245,74 @@ class Carrier extends BaseController {
     });
   }
 
-  uploadCarriers = () => {}
+  uploadCarriers = async(req: Request, res: Response) => {
+    try {
+      const files = (req as any).files;
+      if(!files.excel_file){
+        return this.APIResponseMessages.badRequest(res, 'excel_file is required');
+      }
+      const file = Array.isArray(files.excel_file) ? files.excel_file[0] : files.excel_file;
+
+      const wb = file.tempFilePath ? XLSX.readFile(file.tempFilePath) : XLSX.read(file.data, {type: 'buffer'});
+      const sheetName = wb.SheetNames[0];
+
+      if(!sheetName){
+        return this.APIResponseMessages.badRequest(res, 'Excel file is empty');
+      }
+
+      const sheet = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, {defval: ''});
+
+      if(!rows.length){
+        return this.APIResponseMessages.badRequest(res, 'Excel file contains no data');
+      }
+
+      const carriers = rows.map((row: any, index) => {
+        const name = String(row['name'] || '').trim();
+
+        if(!name){
+          throw new Error(`Name is required at row ${index + 2}`);
+        }
+
+        return {
+          user_id: (req as any).user.id,
+          name: name.slice(0, 128),
+          contact_person: row.contact_person ? String(row['contact_person']).slice(0, 48) : undefined,
+          contact_phone: row.contact_phone ? String(row['contact_phone']).slice(0, 12) : undefined,
+          contact_email: row.contact_email ? String(row['contact_email']).slice(0, 128) : undefined,
+          address_1: row.address_1 ? String(row['address_1']).slice(0, 128) : undefined,
+          address_2: row.address_2 ? String(row['address_2']).slice(0, 128) : undefined,
+          address_3: row.address_3 ? String(row['address_3']).slice(0, 128) : undefined,
+          country: row.country ? String(row['country']).slice(0, 128) : undefined,
+          comment: row.comment ? String(row['comment']).slice(0, 512) : undefined,
+          status: row.status === 'Inactive' || row.status === '0' ? false: true
+        }
+      }).filter((carrier: any) => !carrier.error);
+      const inserted = [];
+      for(const carrier of carriers){
+        if(!carrier.name){
+          continue;
+        }
+        try {
+          const doc = await this.service.baseModel.findOneAndUpdate(
+            {user_id: carrier.user_id, name: carrier.name, deleted: false},
+            carrier,
+            {upsert: true, new: true, setDefaultsOnInsert: true}
+          )
+          inserted.push(doc);
+        } catch (error) {
+          continue;
+        }
+        this.APIResponseMessages.custom(res, {
+          message: 'Carriers uploaded successfully',
+          data: inserted,
+          totalRows: rows.length,
+        })
+      }
+    } catch (error) {
+      return this.APIResponseMessages.errorOccured(res, error as Error);
+    }
+  }
 }
 
 export default new Carrier();
