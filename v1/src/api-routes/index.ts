@@ -1,3 +1,4 @@
 import UserRoutes from './User';
+import CarrierRoutes from './Carrier';
 
-export {UserRoutes }
+export {UserRoutes, CarrierRoutes};

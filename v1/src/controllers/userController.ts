@@ -26,7 +26,6 @@ class User extends BaseContoller {
         );
       }
 
-      console.log("Password:", req.body.password);
       req.body.password = passwordToHash(req.body.password);
 
       const user = await this.service.create(req.body);

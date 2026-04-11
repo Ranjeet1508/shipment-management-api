@@ -27,6 +27,8 @@ class BaseController {
     }
 
     create = (req: Request, res: Response) => {
+        console.log("req comes in create method of base controller", req.body)
+        req.body.user_id = (req as any).user.id;
         let where: {[key: string]: string} = {}
         try {
             if(this.creationLimitBy){
