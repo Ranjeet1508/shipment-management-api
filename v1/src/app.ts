@@ -4,7 +4,7 @@ import loaders from "./loaders";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { UserRoutes, CarrierRoutes } from "./api-routes";
+import { UserRoutes, CarrierRoutes, CustomerRoutes } from "./api-routes";
 
 loaders();
 
@@ -23,6 +23,7 @@ app.use(
 const apiRouter = express.Router();
 apiRouter.use("/users", UserRoutes);
 apiRouter.use("/carriers", CarrierRoutes);
+apiRouter.use("/customers", CustomerRoutes);
 app.use("/api", apiRouter);
 
 app.listen(3001, () => {
