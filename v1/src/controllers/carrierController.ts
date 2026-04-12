@@ -106,6 +106,7 @@ class Carrier extends BaseController {
           value: status ? "Active" : "Inactive"
         }))
       }
+      return this.APIResponseMessages.custom(res, result);
     }
     catch(error){
       return this.APIResponseMessages.errorOccured(res, error as Error);
