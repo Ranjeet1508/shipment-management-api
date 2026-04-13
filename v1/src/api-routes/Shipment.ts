@@ -11,5 +11,11 @@ router.route('/:id/add-sub-shipment').post(authenticate, validate(validationSche
 router.route('/:parentShipmentId/update-sub-shipment/:subShipmentId').patch(authenticate, validate(validationSchemas.updatedSubShipment), Shipment.updatedSubShipment);
 router.route('/arrived-shipments').get(authenticate, Shipment.arrivedShipments);
 router.route('/todays-shipments').get(authenticate, Shipment.todaysShipments);
+router.route('/last-week-shipments').get(authenticate, Shipment.numberOfLastWeekShippedShipments);
+router.route('/number-of-shipment-in-this-year').get(authenticate, Shipment.numberOfShipmentInThisYear)
+router.route('/number-of-shipment-in-this-month').get(authenticate, Shipment.numberOfShipmentsInThisMonth);
+router.route('/status-of-shipment').get(authenticate, Shipment.statusOfShipments);
+router.route('/number-of-shipment').get(authenticate, Shipment.numberOfShipments);
+router.route('/unique-shipment-filter-data').get(authenticate, Shipment.uniqueFilteringData);
 
 export default router;
