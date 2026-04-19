@@ -5,13 +5,26 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { UserRoutes, CarrierRoutes, CustomerRoutes, DockRoutes, ShipmentRoutes } from "./api-routes";
-
+import hpp from 'hpp';
+import rateLimit from "express-rate-limit";
 loaders();
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({
+  limit: '1mb',
+  strict: true,
+  type: 'application/json'
+}));
+app.use(express.urlencoded({ extended: true, limit: '50kb' }));1
+
+app.use(rateLimit({
+  windowMs: 1 * 60 * 1000,        //1 minute
+  limit: 50,
+  standardHeaders: false,
+  message: "Too many request"
+}))
+app.use(hpp());
 app.use(helmet());
 app.use(
   cors({
